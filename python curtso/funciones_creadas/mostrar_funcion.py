@@ -1,0 +1,4 @@
+from funcion_calculo import sumar_numeros
+from funcion_crear_dict_con_nombre_apellido import saludar
+print(sumar_numeros)
+print(saludar)

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poké Analizador Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .type-grid-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .type-grid-btn:active { transform: scale(0.95); }
+        .type-grid-btn.active { ring: 4px solid white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
+        
+        /* Estilos para la tabla maestra */
+        .master-table-wrapper {
+            overflow-x: auto;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            position: relative;
+            background: white;
+        }
+        .master-table { border-spacing: 0; border-collapse: separate; table-layout: fixed; width: 100%; }
+        .master-table td, .master-table th {
+            width: 38px;
+            height: 38px;
+            text-align: center;
+            font-size: 0.7rem;
+            border: 1px solid #f1f5f9;
+            position: relative;
+        }
+
+        /* Resaltado de fila y columna (Crosshair) - Solo visible en pantalla */
+        @media screen {
+            .master-table td:hover::after {
+                content: "";
+                position: absolute;
+                background-color: rgba(99, 102, 241, 0.1);
+                top: -5000px; bottom: -5000px; left: 0; right: 0;
+                z-index: -1;
+            }
+            .master-table tr:hover td { background-color: rgba(99, 102, 241, 0.05); }
+        }
+
+        /* Multiplicadores */
+        .cell-4 { background-color: #b91c1c !important; color: #ffffff; font-weight: 900; } 
+        .cell-2 { background-color: #fca5a5 !important; color: #7f1d1d; font-weight: 800; } 
+        .cell-05 { background-color: #bbf7d0 !important; color: #14532d; font-weight: 800; } 
+        .cell-025 { background-color: #15803d !important; color: #ffffff; font-weight: 900; } 
+        .cell-0 { background-color: #1e293b !important; color: #ffffff; font-weight: 800; } 
+
+        .label-vertical {
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            text-orientation: mixed;
+        }
+
+        /* Ocultar elementos en la captura si es necesario */
+        .exporting .no-export { display: none !important; }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen pb-20 transition-colors duration-500" id="body-bg">
+
+    <div class="max-w-4xl mx-auto px-4 pt-8">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 mb-2">Poké Analizador <span class="text-indigo-600">Pro</span></h1>
+            <p class="text-slate-500 font-medium">Calculadora avanzada de debilidades y coberturas</p>
+        </header>
+
+        <!-- Selector de Tipos (Interactivo) -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-6 mb-8 no-print">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <h2 class="text-lg font-bold text-slate-800">Selecciona hasta 2 tipos del Pokémon:</h2>
+                <button onclick="resetTypes()" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 px-4 py-2 bg-indigo-50 rounded-full transition-colors">Limpiar selección</button>
+            </div>
+            <div id="type-selector-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-3"></div>
+        </div>
+
+        <!-- Panel de Resultados Dinámicos -->
+        <div id="results-panel" class="hidden space-y-6 mb-16">
+            <div id="main-card" class="rounded-[2.5rem] p-8 text-white shadow-2xl transition-all duration-500">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <div id="type-labels" class="flex gap-2 mb-3"></div>
+                        <h2 id="pokemon-title" class="text-4xl font-black"></h2>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-md rounded-3xl p-5 border border-white/30 text-center min-w-[160px]">
+                        <p class="text-xs uppercase font-bold tracking-widest mb-1 opacity-80">Riesgo Global</p>
+                        <p id="risk-status" class="text-xl font-extrabold"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <!-- Defensiva -->
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 space-y-6">
+                    <h3 class="flex items-center gap-2 text-xl font-extrabold text-slate-800">
+                        <span class="p-2 bg-blue-50 rounded-xl text-blue-500">🛡️</span> Recibe Daño de:
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-xs font-bold text-red-500 uppercase tracking-wider mb-2">Debilidades</p>
+                            <div id="weaknesses" class="flex flex-wrap gap-2"></div>
+                        </div>
+                        <hr class="border-slate-50">
+                        <div>
+                            <p class="text-xs font-bold text-green-500 uppercase tracking-wider mb-2">Resistencias</p>
+                            <div id="resistances" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Ofensiva -->
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 space-y-6">
+                    <h3 class="flex items-center gap-2 text-xl font-extrabold text-slate-800">
+                        <span class="p-2 bg-orange-50 rounded-xl text-orange-500">⚔️</span> Sus ataques ganan a:
+                    </h3>
+                    <div id="coverage" class="flex flex-wrap gap-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE TABLA MAESTRA -->
+        <div class="mt-10 md:mt-20">
+            <div class="flex flex-col md:flex-row md:items-end justify-between mb-6 gap-4">
+                <div>
+                    <h2 class="text-2xl md:text-3xl font-black text-slate-900 leading-tight">Tabla de Referencia Maestra</h2>
+                    <p class="text-slate-500 font-medium text-sm">Mira la intersección: <span class="text-indigo-600 font-bold">Línea Izquierda</span> (Ataca) vs <span class="text-indigo-600 font-bold">Línea Superior</span> (Defiende)</p>
+                </div>
+                <button onclick="downloadAsImage()" id="download-btn" class="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white rounded-2xl font-bold hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12"/></svg>
+                    <span>Guardar como Imagen (PNG)</span>
+                </button>
+            </div>
+
+            <!-- Este es el contenedor que se fotografiará -->
+            <div id="capture-area" class="bg-slate-50 p-4 rounded-[3rem]">
+                <div class="relative bg-white p-4 md:p-8 rounded-[2.5rem] border border-slate-200">
+                    <!-- Etiqueta Superior -->
+                    <div class="flex justify-center mb-4">
+                        <div class="bg-blue-600 text-white px-6 py-1 rounded-full text-[10px] font-black tracking-[0.15em] uppercase">🛡️ TIPO QUE DEFIENDE</div>
+                    </div>
+
+                    <div class="flex gap-2 md:gap-4">
+                        <!-- Etiqueta Lateral -->
+                        <div class="flex items-center">
+                            <div class="label-vertical bg-orange-600 text-white px-1.5 py-6 rounded-full text-[10px] font-black tracking-[0.15em] uppercase">⚔️ TIPO ATACANTE</div>
+                        </div>
+
+                        <!-- La Tabla en sí -->
+                        <div class="master-table-wrapper flex-1">
+                            <table class="master-table w-full" id="master-chart">
+                                <thead>
+                                    <tr id="master-header">
+                                        <th class="bg-slate-100 border-none rounded-tl-xl"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="master-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Leyenda compacta incluida en la imagen -->
+                    <div class="mt-8 grid grid-cols-5 gap-2 text-center max-w-md mx-auto">
+                        <div class="flex flex-col items-center">
+                            <span class="w-full h-6 flex items-center justify-center rounded cell-4 text-[10px]">4</span>
+                            <span class="text-[8px] text-slate-400 font-bold uppercase mt-1">Súper x4</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="w-full h-6 flex items-center justify-center rounded cell-2 text-[10px]">2</span>
+                            <span class="text-[8px] text-slate-400 font-bold uppercase mt-1">Efectivo x2</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="w-full h-6 flex items-center justify-center rounded cell-05 text-[10px]">½</span>
+                            <span class="text-[8px] text-slate-400 font-bold uppercase mt-1">Resiste ½</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="w-full h-6 flex items-center justify-center rounded cell-025 text-[10px]">¼</span>
+                            <span class="text-[8px] text-slate-400 font-bold uppercase mt-1">Resiste ¼</span>
+                        </div>
+                        <div class="flex flex-col items-center">
+                            <span class="w-full h-6 flex items-center justify-center rounded cell-0 text-[10px]">0</span>
+                            <span class="text-[8px] text-slate-400 font-bold uppercase mt-1">Inmune</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-full text-sm font-bold shadow-xl opacity-0 transition-opacity pointer-events-none z-50">
+        ¡Imagen generada con éxito!
+    </div>
+
+<script>
+const types = {
+    normal:{name:"Nor",color:"#A8A77A", fullName: "Normal"},
+    fire:{name:"Fue",color:"#EE8130", fullName: "Fuego"},
+    water:{name:"Agu",color:"#6390F0", fullName: "Agua"},
+    electric:{name:"Ele",color:"#F7D02C", fullName: "Eléctrico"},
+    grass:{name:"Pla",color:"#7AC74C", fullName: "Planta"},
+    ice:{name:"Hie",color:"#96D9D6", fullName: "Hielo"},
+    fighting:{name:"Luc",color:"#C22E28", fullName: "Lucha"},
+    poison:{name:"Ven",color:"#A33EA1", fullName: "Veneno"},
+    ground:{name:"Tie",color:"#E2BF65", fullName: "Tierra"},
+    flying:{name:"Vol",color:"#A98FF3", fullName: "Volador"},
+    psychic:{name:"Psi",color:"#F95587", fullName: "Psíquico"},
+    bug:{name:"Bic",color:"#A6B91A", fullName: "Bicho"},
+    rock:{name:"Roc",color:"#B6A136", fullName: "Roca"},
+    ghost:{name:"Fan",color:"#735797", fullName: "Fantasma"},
+    dragon:{name:"Dra",color:"#6F35FC", fullName: "Dragón"},
+    dark:{name:"Sin",color:"#705746", fullName: "Siniestro"},
+    steel:{name:"Ace",color:"#B7B7CE", fullName: "Acero"},
+    fairy:{name:"Had",color:"#D685AD", fullName: "Hada"}
+};
+
+const chart = {
+    normal: { rock: .5, ghost: 0, steel: .5 },
+    fire: { grass: 2, ice: 2, bug: 2, steel: 2, water: .5, fire: .5, rock: .5, dragon: .5 },
+    water: { fire: 2, ground: 2, rock: 2, water: .5, grass: .5, dragon: .5 },
+    electric: { water: 2, flying: 2, electric: .5, grass: .5, dragon: .5, ground: 0 },
+    grass: { water: 2, ground: 2, rock: 2, fire: .5, grass: .5, poison: .5, flying: .5, bug: .5, dragon: .5, steel: .5 },
+    ice: { grass: 2, ground: 2, flying: 2, dragon: 2, fire: .5, water: .5, ice: .5, steel: .5 },
+    fighting: { normal: 2, ice: 2, rock: 2, dark: 2, steel: 2, poison: .5, flying: .5, psychic: .5, bug: .5, fairy: .5, ghost: 0 },
+    poison: { grass: 2, fairy: 2, poison: .5, ground: .5, rock: .5, ghost: .5, steel: 0 },
+    ground: { fire: 2, electric: 2, poison: 2, rock: 2, steel: 2, grass: .5, bug: .5, flying: 0 },
+    flying: { grass: 2, fighting: 2, bug: 2, electric: .5, rock: .5, steel: .5 },
+    psychic: { fighting: 2, poison: 2, psychic: .5, steel: .5, dark: 0 },
+    bug: { grass: 2, psychic: 2, dark: 2, fire: .5, fighting: .5, poison: .5, flying: .5, ghost: .5, steel: .5, fairy: .5 },
+    rock: { fire: 2, ice: 2, flying: 2, bug: 2, fighting: .5, ground: .5, steel: .5 },
+    ghost: { psychic: 2, ghost: 2, dark: .5, normal: 0 },
+    dragon: { dragon: 2, steel: .5, fairy: 0 },
+    dark: { psychic: 2, ghost: 2, fighting: .5, dark: .5, fairy: .5 },
+    steel: { ice: 2, rock: 2, fairy: 2, fire: .5, water: .5, electric: .5, steel: .5 },
+    fairy: { fighting: 2, dragon: 2, dark: 2, fire: .5, poison: .5, steel: .5 }
+};
+
+let selectedTypes = [];
+
+function initApp() {
+    const grid = document.getElementById('type-selector-grid');
+    const head = document.getElementById('master-header');
+    const typeKeys = Object.keys(types);
+
+    typeKeys.forEach(id => {
+        const btn = document.createElement('button');
+        btn.className = `type-grid-btn p-3 rounded-2xl flex flex-col items-center gap-1 border border-transparent`;
+        btn.style.backgroundColor = `${types[id].color}20`;
+        btn.innerHTML = `<span class="w-3 h-3 rounded-full" style="background:${types[id].color}"></span>
+                         <span class="text-[11px] font-bold uppercase" style="color:${types[id].color}">${types[id].name}</span>`;
+        btn.onclick = () => toggleType(id);
+        btn.id = `btn-${id}`;
+        grid.appendChild(btn);
+
+        const th = document.createElement('th');
+        th.style.backgroundColor = types[id].color;
+        th.className = "text-white font-black text-[8px] uppercase";
+        th.textContent = types[id].name;
+        head.appendChild(th);
+    });
+
+    renderMasterTable();
+}
+
+function renderMasterTable() {
+    const body = document.getElementById('master-body');
+    const typeKeys = Object.keys(types);
+    body.innerHTML = "";
+
+    typeKeys.forEach(atkId => {
+        const row = document.createElement('tr');
+        const rowHeader = document.createElement('th');
+        rowHeader.style.backgroundColor = types[atkId].color;
+        rowHeader.className = "text-white font-black text-[8px] uppercase sticky left-0 z-10";
+        rowHeader.textContent = types[atkId].name;
+        row.appendChild(rowHeader);
+
+        typeKeys.forEach(defId => {
+            const cell = document.createElement('td');
+            let mult = chart[atkId]?.[defId] ?? 1;
+            
+            if (mult === 2) { cell.textContent = '2'; cell.className = 'cell-2'; }
+            else if (mult === 0.5) { cell.textContent = '½'; cell.className = 'cell-05'; }
+            else if (mult === 0) { cell.textContent = '0'; cell.className = 'cell-0'; }
+            
+            row.appendChild(cell);
+        });
+        body.appendChild(row);
+    });
+}
+
+function downloadAsImage() {
+    const element = document.getElementById('capture-area');
+    const btn = document.getElementById('download-btn');
+    const originalText = btn.innerHTML;
+    
+    btn.innerHTML = `<span>Generando...</span>`;
+    btn.disabled = true;
+
+    // Usamos html2canvas para crear la imagen
+    html2canvas(element, {
+        backgroundColor: '#f8fafc',
+        scale: 2, // Mayor calidad
+        logging: false,
+        useCORS: true
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Tabla-Tipos-Pokemon.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        // Mostrar Toast
+        const toast = document.getElementById('toast');
+        toast.style.opacity = "1";
+        setTimeout(() => toast.style.opacity = "0", 3000);
+    });
+}
+
+function toggleType(id) {
+    if (selectedTypes.includes(id)) {
+        selectedTypes = selectedTypes.filter(t => t !== id);
+    } else {
+        if (selectedTypes.length >= 2) selectedTypes.shift();
+        selectedTypes.push(id);
+    }
+    render();
+}
+
+function resetTypes() {
+    selectedTypes = [];
+    render();
+}
+
+function render() {
+    document.querySelectorAll('.type-grid-btn').forEach(btn => {
+        const id = btn.id.replace('btn-', '');
+        const isActive = selectedTypes.includes(id);
+        btn.classList.toggle('active', isActive);
+        btn.style.backgroundColor = isActive ? types[id].color : `${types[id].color}20`;
+        btn.querySelector('span:last-child').style.color = isActive ? 'white' : types[id].color;
+    });
+
+    const panel = document.getElementById('results-panel');
+    if (selectedTypes.length === 0) {
+        panel.classList.add('hidden');
+        document.getElementById('body-bg').className = 'bg-slate-50 min-h-screen pb-20';
+        return;
+    }
+
+    panel.classList.remove('hidden');
+    const t1 = selectedTypes[0], t2 = selectedTypes[1];
+    document.getElementById('main-card').style.backgroundColor = types[t1].color;
+    document.getElementById('pokemon-title').textContent = types[t1].fullName + (t2 ? ` / ${types[t2].fullName}` : '');
+    document.getElementById('type-labels').innerHTML = selectedTypes.map(t => 
+        `<span class="px-3 py-0.5 rounded-full bg-white/20 border border-white/30 text-[10px] font-bold uppercase">${types[t].fullName}</span>`
+    ).join('');
+
+    const weakDiv = document.getElementById('weaknesses');
+    const resiDiv = document.getElementById('resistances');
+    weakDiv.innerHTML = resiDiv.innerHTML = "";
+    
+    let dangerScore = 0;
+    for (let atk in types) {
+        let m = chart[atk]?.[t1] ?? 1;
+        if (t2) m *= chart[atk]?.[t2] ?? 1;
+        if (m === 1) continue;
+
+        const badgeText = m === 0.5 ? '½' : (m === 0.25 ? '¼' : m);
+        const badgeClass = m >= 4 ? 'ring-2 ring-red-500/50' : (m <= 0.25 ? 'ring-2 ring-green-500/50' : '');
+        const badge = `<div class="flex items-center gap-1.5 px-2 py-1 rounded-lg text-white shadow-sm ${badgeClass}" style="background:${types[atk].color}">
+            <span class="text-[9px] font-black uppercase">${types[atk].name}</span>
+            <span class="bg-black/20 px-1 rounded text-[9px] font-bold">x${badgeText}</span>
+        </div>`;
+
+        if (m > 1) { weakDiv.innerHTML += badge; dangerScore += (m >= 4 ? 3 : 1); }
+        else if (m < 1) { resiDiv.innerHTML += badge; }
+    }
+    document.getElementById('risk-status').textContent = dangerScore >= 5 ? "EXTREMO" : (dangerScore >= 2 ? "MEDIO" : "BAJO");
+
+    const coverageDiv = document.getElementById('coverage');
+    coverageDiv.innerHTML = "";
+    const effective = new Set();
+    selectedTypes.forEach(t => { if(chart[t]) Object.entries(chart[t]).forEach(([target, m]) => { if(m>1) effective.add(target); })});
+    effective.forEach(t => {
+        coverageDiv.innerHTML += `<div class="flex items-center gap-1.5 px-2 py-1 rounded-lg text-white shadow-sm" style="background:${types[t].color}">
+            <span class="text-[9px] font-black uppercase">${types[t].name}</span>
+        </div>`;
+    });
+}
+
+window.onload = initApp;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contador de Caracteres</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-2xl">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Contador de Caracteres</h1>
+        
+        <p class="text-center text-gray-600 mb-6">
+            Pega tu texto a continuación para contar el número total de caracteres, incluyendo espacios.
+        </p>
+
+        <textarea 
+            id="textInput" 
+            class="w-full h-48 p-4 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all resize-y"
+            placeholder="Escribe o pega tu texto aquí..."></textarea>
+        
+        <div class="mt-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0">
+            <div class="bg-blue-100 text-blue-800 font-bold py-3 px-6 rounded-full text-lg shadow-md transition-transform transform hover:scale-105">
+                Total de caracteres: <span id="charCount" class="ml-2">0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const textInput = document.getElementById('textInput');
+            const charCount = document.getElementById('charCount');
+
+            // Listen for input events on the textarea
+            textInput.addEventListener('input', () => {
+                const text = textInput.value;
+                charCount.textContent = text.length;
+            });
+
+            // Initial count in case the textarea has content on load
+            charCount.textContent = textInput.value.length;
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divisor de Texto Inteligente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .input-area {
+            resize: none;
+        }
+        .result-box {
+            background-color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container rounded-2xl shadow-lg">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-4">Divisor de Texto Inteligente</h1>
+        <p class="text-center text-gray-600 mb-6">
+            Pega tu texto largo aquí. Se dividirá en fragmentos de no más de 124 caracteres, sin cortar palabras.
+        </p>
+
+        <textarea
+            id="textInput"
+            class="input-area w-full p-4 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors mb-4"
+            rows="10"
+            placeholder="Escribe o pega tu texto aquí..."
+        ></textarea>
+
+        <div id="resultsContainer">
+            <!-- Los resultados se mostrarán aquí -->
+        </div>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const MAX_LENGTH = 124;
+
+        // Escucha el evento 'input' para actualizar la división en tiempo real
+        textInput.addEventListener('input', () => {
+            const text = textInput.value;
+            const fragments = splitText(text, MAX_LENGTH);
+            displayResults(fragments);
+        });
+
+        /**
+         * Divide el texto en fragmentos de una longitud máxima sin cortar palabras.
+         * @param {string} text - El texto a dividir.
+         * @param {number} maxLength - La longitud máxima de cada fragmento.
+         * @returns {string[]} Un array de fragmentos de texto.
+         */
+        function splitText(text, maxLength) {
+            // Si el texto es más corto o igual a la longitud máxima, no hay necesidad de dividirlo.
+            if (text.length <= maxLength) {
+                return [text];
+            }
+
+            const fragments = [];
+            let remainingText = text.trim();
+
+            // Bucle que continúa mientras haya texto restante por procesar.
+            while (remainingText.length > 0) {
+                // Si el texto restante es menor o igual a la longitud máxima, lo añadimos como el último fragmento y salimos del bucle.
+                if (remainingText.length <= maxLength) {
+                    fragments.push(remainingText);
+                    remainingText = '';
+                    break;
+                }
+
+                // Encontramos el último espacio o salto de línea antes del límite de 124 caracteres.
+                let splitPoint = remainingText.lastIndexOf(' ', maxLength);
+                
+                // Si no se encuentra un espacio, buscamos un salto de línea.
+                if (splitPoint === -1) {
+                    splitPoint = remainingText.lastIndexOf('\n', maxLength);
+                }
+
+                // Caso especial: si una palabra es más larga que la longitud máxima, la cortamos en ese punto para evitar un bucle infinito.
+                if (splitPoint === -1) {
+                    splitPoint = maxLength;
+                }
+
+                // Extraemos el fragmento de texto desde el inicio hasta el punto de división.
+                const fragment = remainingText.substring(0, splitPoint).trim();
+                fragments.push(fragment);
+
+                // Actualizamos el texto restante para la siguiente iteración.
+                remainingText = remainingText.substring(splitPoint).trim();
+            }
+
+            return fragments;
+        }
+
+        /**
+         * Muestra los fragmentos de texto en la interfaz de usuario.
+         * @param {string[]} fragments - El array de fragmentos de texto a mostrar.
+         */
+        function displayResults(fragments) {
+            resultsContainer.innerHTML = '';
+            // Si el texto de entrada está vacío, no mostramos nada.
+            if (fragments.length === 0 || (fragments.length === 1 && fragments[0] === '')) {
+                return;
+            }
+
+            // Creamos un cuadro para cada fragmento y lo añadimos al contenedor de resultados.
+            fragments.forEach((fragment, index) => {
+                const fragmentDiv = document.createElement('div');
+                fragmentDiv.className = 'result-box flex justify-between items-center text-gray-800';
+
+                // Usamos un contenedor para el texto y la información, y otro para el botón.
+                fragmentDiv.innerHTML = `
+                    <div class="flex-grow pr-4">
+                        <p class="font-bold mb-1">Fragmento ${index + 1} (${fragment.length} caracteres)</p>
+                        <pre class="whitespace-pre-wrap">${fragment}</pre>
+                    </div>
+                    <button class="copy-btn bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        Copiar
+                    </button>
+                `;
+                
+                resultsContainer.appendChild(fragmentDiv);
+            });
+            
+            // Agregamos los event listeners a cada botón después de que se han creado.
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    // Obtenemos el texto del fragmento que está en el mismo contenedor que el botón.
+                    const fragmentText = event.target.closest('.result-box').querySelector('pre').textContent;
+                    copyToClipboard(fragmentText, event.target);
+                });
+            });
+        }
+
+        /**
+         * Copia el texto al portapapeles y da retroalimentación visual.
+         * @param {string} text - El texto a copiar.
+         * @param {HTMLElement} button - El botón que se hizo clic.
+         */
+        function copyToClipboard(text, button) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                // Usa la API de Portapapeles moderna.
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showCopyFeedback(button);
+                    })
+                    .catch(err => {
+                        console.error('Error al copiar al portapapeles:', err);
+                        // Fallback si la API falla.
+                        fallbackCopy(text, button);
+                    });
+            } else {
+                // Usa el método de "ejecutar comando" como fallback para navegadores antiguos.
+                fallbackCopy(text, button);
+            }
+        }
+
+        /**
+         * Método de copia de respaldo.
+         * @param {string} text - El texto a copiar.
+         * @param {HTMLElement} button - El botón que se hizo clic.
+         */
+        function fallbackCopy(text, button) {
+            const tempTextarea = document.createElement('textarea');
+            tempTextarea.value = text;
+            document.body.appendChild(tempTextarea);
+            tempTextarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextarea);
+            showCopyFeedback(button);
+        }
+
+        /**
+         * Muestra la retroalimentación visual de la copia.
+         * @param {HTMLElement} button - El botón para mostrar la retroalimentación.
+         */
+        function showCopyFeedback(button) {
+            const originalText = button.textContent;
+            button.textContent = '¡Copiado!';
+            setTimeout(() => {
+                button.textContent = originalText;
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

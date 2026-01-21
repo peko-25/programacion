@@ -1,0 +1,11 @@
+los datos son: 
+
+nombre: lucas 
+apellido: dalño
+------------------
+nombre: jhon 
+apellido: whik
+------------------
+nombre: dalto 
+apellido: luñas
+------------------

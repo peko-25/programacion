@@ -1,0 +1,26 @@
+def main():
+    flashcards = {
+        "¿Autor de 'La riqueza de las naciones'?": "Adam Smith",
+        "¿Qué es ceteris paribus?": "Supuesto de 'todo lo demás constante'.",
+        "¿Qué critica Astarita en los modelos neoclásicos?": "Supuestos irreales como agentes infinitamente racionales."
+    }
+
+    print("¡Bienvenido a las Flashcards!\n")
+    
+    while True:
+        pregunta = input("Presiona Enter para ver una pregunta (o escribe 'salir' para terminar): ").strip().lower()
+        if pregunta == "salir":
+            break
+        
+        pregunta_actual = list(flashcards.keys())[0]
+        print(f"\nPregunta: {pregunta_actual}")
+        input("Presiona Enter para ver la respuesta...")
+        print(f"Respuesta: {flashcards[pregunta_actual]}\n")
+        del flashcards[pregunta_actual]
+        
+        if not flashcards:
+            print("\n¡Has repasado todas las flashcards!")
+            break
+
+if __name__ == "__main__":
+    main()

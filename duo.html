@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poké Analizador Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .type-grid-btn { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .type-grid-btn:active { transform: scale(0.95); }
+        .type-grid-btn.active { outline: 4px solid white; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2); }
+        .glass { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); }
+        .badge-anim { animation: pop 0.3s ease-out; }
+        @keyframes pop {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 min-h-screen pb-12 transition-colors duration-500" id="body-bg">
+
+    <div class="max-w-4xl mx-auto px-4 pt-8">
+        <!-- Header -->
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 mb-2">Poké Analizador <span class="text-indigo-600">Pro</span></h1>
+            <p class="text-slate-500 font-medium">Calculadora avanzada de debilidades y coberturas</p>
+        </header>
+
+        <!-- Selector de Tipos -->
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-6 mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <h2 class="text-lg font-bold text-slate-800">Selecciona hasta 2 tipos:</h2>
+                <button onclick="resetTypes()" class="text-sm font-bold text-indigo-600 hover:text-indigo-800 px-4 py-2 bg-indigo-50 rounded-full transition-colors">Limpiar selección</button>
+            </div>
+            
+            <div id="type-selector-grid" class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                <!-- Se genera dinámicamente -->
+            </div>
+        </div>
+
+        <!-- Panel de Resultados -->
+        <div id="results-panel" class="hidden space-y-6">
+            
+            <!-- Resumen Principal -->
+            <div id="main-card" class="rounded-[2.5rem] p-8 text-white shadow-2xl transition-all duration-500">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <div id="type-labels" class="flex gap-2 mb-3"></div>
+                        <h2 id="pokemon-title" class="text-4xl font-black"></h2>
+                    </div>
+                    <div class="bg-white/20 backdrop-blur-md rounded-3xl p-5 border border-white/30 text-center min-w-[160px]">
+                        <p class="text-xs uppercase font-bold tracking-widest mb-1 opacity-80">Riesgo Global</p>
+                        <p id="risk-status" class="text-xl font-extrabold"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grillas de Análisis -->
+            <div class="grid md:grid-cols-2 gap-6">
+                
+                <!-- Defensiva -->
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 space-y-6">
+                    <h3 class="flex items-center gap-2 text-xl font-extrabold text-slate-800">
+                        <span class="p-2 bg-blue-50 rounded-xl text-blue-500">🛡️</span> Defensiva
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <p class="text-xs font-bold text-red-500 uppercase tracking-wider mb-2">Debilidades (Recibe x2/x4)</p>
+                            <div id="weaknesses" class="flex flex-wrap gap-2"></div>
+                        </div>
+                        <hr class="border-slate-50">
+                        <div>
+                            <p class="text-xs font-bold text-green-500 uppercase tracking-wider mb-2">Resistencias (Recibe x0.5/x0.25)</p>
+                            <div id="resistances" class="flex flex-wrap gap-2"></div>
+                        </div>
+                        <hr class="border-slate-50">
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Inmunidades (Recibe x0)</p>
+                            <div id="immunities" class="flex flex-wrap gap-2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ofensiva -->
+                <div class="bg-white rounded-[2.5rem] shadow-sm border border-slate-100 p-8 space-y-6">
+                    <h3 class="flex items-center gap-2 text-xl font-extrabold text-slate-800">
+                        <span class="p-2 bg-orange-50 rounded-xl text-orange-500">⚔️</span> Ofensiva (STAB)
+                    </h3>
+                    <p class="text-sm text-slate-500 leading-relaxed">Tipos contra los que tus ataques son Súper Efectivos:</p>
+                    
+                    <div id="coverage" class="flex flex-wrap gap-2"></div>
+                    
+                    <div class="bg-slate-50 rounded-2xl p-4 mt-4">
+                        <p class="text-xs text-slate-400 italic">Nota: El daño x2 se aplica al usar movimientos del mismo tipo que el Pokémon.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+const types = {
+    normal:{name:"Normal",color:"#A8A77A"},
+    fire:{name:"Fuego",color:"#EE8130"},
+    water:{name:"Agua",color:"#6390F0"},
+    electric:{name:"Eléctrico",color:"#F7D02C"},
+    grass:{name:"Planta",color:"#7AC74C"},
+    ice:{name:"Hielo",color:"#96D9D6"},
+    fighting:{name:"Lucha",color:"#C22E28"},
+    poison:{name:"Veneno",color:"#A33EA1"},
+    ground:{name:"Tierra",color:"#E2BF65"},
+    flying:{name:"Volador",color:"#A98FF3"},
+    psychic:{name:"Psíquico",color:"#F95587"},
+    bug:{name:"Bicho",color:"#A6B91A"},
+    rock:{name:"Roca",color:"#B6A136"},
+    ghost:{name:"Fantasma",color:"#735797"},
+    dragon:{name:"Dragón",color:"#6F35FC"},
+    dark:{name:"Siniestro",color:"#705746"},
+    steel:{name:"Acero",color:"#B7B7CE"},
+    fairy:{name:"Hada",color:"#D685AD"}
+};
+
+const chart = {
+    normal: { rock: .5, ghost: 0, steel: .5 },
+    fire: { grass: 2, ice: 2, bug: 2, steel: 2, water: .5, fire: .5, rock: .5, dragon: .5 },
+    water: { fire: 2, ground: 2, rock: 2, water: .5, grass: .5, dragon: .5 },
+    electric: { water: 2, flying: 2, electric: .5, grass: .5, dragon: .5, ground: 0 },
+    grass: { water: 2, ground: 2, rock: 2, fire: .5, grass: .5, poison: .5, flying: .5, bug: .5, dragon: .5, steel: .5 },
+    ice: { grass: 2, ground: 2, flying: 2, dragon: 2, fire: .5, water: .5, ice: .5, steel: .5 },
+    fighting: { normal: 2, ice: 2, rock: 2, dark: 2, steel: 2, poison: .5, flying: .5, psychic: .5, bug: .5, fairy: .5, ghost: 0 },
+    poison: { grass: 2, fairy: 2, poison: .5, ground: .5, rock: .5, ghost: .5, steel: 0 },
+    ground: { fire: 2, electric: 2, poison: 2, rock: 2, steel: 2, grass: .5, bug: .5, flying: 0 },
+    flying: { grass: 2, fighting: 2, bug: 2, electric: .5, rock: .5, steel: .5 },
+    psychic: { fighting: 2, poison: 2, psychic: .5, steel: .5, dark: 0 },
+    bug: { grass: 2, psychic: 2, dark: 2, fire: .5, fighting: .5, poison: .5, flying: .5, ghost: .5, steel: .5, fairy: .5 },
+    rock: { fire: 2, ice: 2, flying: 2, bug: 2, fighting: .5, ground: .5, steel: .5 },
+    ghost: { psychic: 2, ghost: 2, dark: .5, normal: 0 },
+    dragon: { dragon: 2, steel: .5, fairy: 0 },
+    dark: { psychic: 2, ghost: 2, fighting: .5, dark: .5, fairy: .5 },
+    steel: { ice: 2, rock: 2, fairy: 2, fire: .5, water: .5, electric: .5, steel: .5 },
+    fairy: { fighting: 2, dragon: 2, dark: 2, fire: .5, poison: .5, steel: .5 }
+};
+
+let selectedTypes = [];
+
+// Init UI
+function initSelector() {
+    const container = document.getElementById('type-selector-grid');
+    Object.entries(types).forEach(([id, type]) => {
+        const btn = document.createElement('button');
+        btn.className = `type-grid-btn p-3 rounded-2xl flex flex-col items-center justify-center gap-1 border border-transparent`;
+        btn.style.backgroundColor = `${type.color}20`; // Low opacity background
+        btn.innerHTML = `
+            <span class="w-3 h-3 rounded-full" style="background:${type.color}"></span>
+            <span class="text-[11px] font-bold uppercase" style="color:${type.color}">${type.name}</span>
+        `;
+        btn.onclick = () => toggleType(id);
+        btn.id = `btn-${id}`;
+        container.appendChild(btn);
+    });
+}
+
+function toggleType(id) {
+    if (selectedTypes.includes(id)) {
+        selectedTypes = selectedTypes.filter(t => t !== id);
+    } else {
+        if (selectedTypes.length >= 2) selectedTypes.shift();
+        selectedTypes.push(id);
+    }
+    render();
+}
+
+function resetTypes() {
+    selectedTypes = [];
+    render();
+}
+
+function render() {
+    // UI Update Selectors
+    document.querySelectorAll('.type-grid-btn').forEach(btn => {
+        const id = btn.id.replace('btn-', '');
+        if (selectedTypes.includes(id)) {
+            btn.classList.add('active', 'scale-105');
+            btn.style.borderColor = types[id].color;
+            btn.style.backgroundColor = types[id].color;
+            btn.querySelector('span:last-child').style.color = 'white';
+            btn.querySelector('span:first-child').style.backgroundColor = 'white';
+        } else {
+            btn.classList.remove('active', 'scale-105');
+            btn.style.borderColor = 'transparent';
+            btn.style.backgroundColor = `${types[id].color}20`;
+            btn.querySelector('span:last-child').style.color = types[id].color;
+            btn.querySelector('span:first-child').style.backgroundColor = types[id].color;
+        }
+    });
+
+    const panel = document.getElementById('results-panel');
+    if (selectedTypes.length === 0) {
+        panel.classList.add('hidden');
+        document.getElementById('body-bg').style.backgroundColor = '#f8fafc';
+        return;
+    }
+
+    panel.classList.remove('hidden');
+
+    // Title and Background
+    const t1 = selectedTypes[0];
+    const t2 = selectedTypes[1];
+    const mainColor = types[t1].color;
+    document.getElementById('main-card').style.backgroundColor = mainColor;
+    document.getElementById('pokemon-title').textContent = types[t1].name + (t2 ? ` / ${types[t2].name}` : '');
+    
+    document.getElementById('type-labels').innerHTML = selectedTypes.map(t => 
+        `<span class="px-3 py-0.5 rounded-full bg-white/20 border border-white/30 text-[10px] font-bold uppercase">${types[t].name}</span>`
+    ).join('');
+
+    // Calc Defenses
+    const defense = {};
+    for (let atk in types) {
+        let m = chart[atk]?.[t1] ?? 1;
+        if (t2) m *= chart[atk]?.[t2] ?? 1;
+        defense[atk] = m;
+    }
+
+    // Render Badges
+    const renderBadge = (t, m) => `
+        <div class="badge-anim flex items-center gap-2 px-3 py-1.5 rounded-xl text-white shadow-sm" style="background:${types[t].color}">
+            <span class="text-xs font-black uppercase">${types[t].name}</span>
+            <span class="bg-black/20 px-1.5 py-0.5 rounded text-[10px] font-bold">x${m}</span>
+        </div>
+    `;
+
+    const weakDiv = document.getElementById('weaknesses');
+    const resiDiv = document.getElementById('resistances');
+    const immuDiv = document.getElementById('immunities');
+    
+    weakDiv.innerHTML = resiDiv.innerHTML = immuDiv.innerHTML = "";
+    
+    let dangerScore = 0;
+
+    Object.entries(defense).sort((a,b) => b[1] - a[1]).forEach(([t, m]) => {
+        if (m > 1) {
+            weakDiv.innerHTML += renderBadge(t, m);
+            dangerScore += (m === 4 ? 2 : 1);
+        } else if (m > 0 && m < 1) {
+            resiDiv.innerHTML += renderBadge(t, m);
+        } else if (m === 0) {
+            immuDiv.innerHTML += renderBadge(t, m);
+        }
+    });
+
+    if(!weakDiv.innerHTML) weakDiv.innerHTML = '<p class="text-sm text-slate-300 italic">Ninguna debilidad</p>';
+    if(!resiDiv.innerHTML) resiDiv.innerHTML = '<p class="text-sm text-slate-300 italic">Ninguna resistencia</p>';
+    if(!immuDiv.innerHTML) immuDiv.innerHTML = '<p class="text-sm text-slate-300 italic">Sin inmunidades</p>';
+
+    // Risk Status
+    const risk = document.getElementById('risk-status');
+    if (dangerScore >= 4) risk.textContent = "EXTREMO";
+    else if (dangerScore >= 2) risk.textContent = "MODERADO";
+    else risk.textContent = "EXCELENTE";
+
+    // Ofensiva (STAB)
+    const coverageDiv = document.getElementById('coverage');
+    const effectiveTypes = new Set();
+    selectedTypes.forEach(t => {
+        if (chart[t]) {
+            Object.entries(chart[t]).forEach(([target, m]) => {
+                if (m > 1) effectiveTypes.add(target);
+            });
+        }
+    });
+
+    coverageDiv.innerHTML = "";
+    Array.from(effectiveTypes).forEach(t => {
+        coverageDiv.innerHTML += renderBadge(t, 2);
+    });
+    if(!coverageDiv.innerHTML) coverageDiv.innerHTML = '<p class="text-sm text-slate-300 italic">Cobertura neutra</p>';
+}
+
+window.onload = initSelector;
+</script>
+
+</body>
+</html>

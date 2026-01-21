@@ -1,0 +1,392 @@
+1. Combat (Combate)
+Anchor Aura: Activa anclas de reaparición cerca de enemigos.
+
+Anti Anvil: Evita el daño por yunques.
+
+Anti Bed: Evita el daño por camas en el Nether/End.
+
+Arrow Dodge: Esquiva flechas automáticamente.
+
+Auto Anvil: Coloca yunques automáticamente.
+
+Auto Armor: Equipa la mejor armadura automáticamente.
+
+Auto City: Coloca bloques alrededor de enemigos para atraparlos.
+
+Auto Exp: Recoge experiencia automáticamente.
+
+Auto Log: Cierra sesión automáticamente si tu salud es baja.
+
+Auto Totem: Equipa totems de inmortalidad automáticamente.
+
+Auto Trap: Atrapa a enemigos en bloques automáticamente.
+
+Auto Weapon: Cambia automáticamente a la mejor arma.
+
+Auto Web: Coloca telarañas automáticamente.
+
+Bed Aura: Activa camas cerca de enemigos en el Nether/End.
+
+Bow Aimbot: Apunta automáticamente con el arco.
+
+Bow Spam: Dispara flechas rápidamente.
+
+Burrow: Te entierra en bloques para protegerte.
+
+Criticals: Asegura golpes críticos.
+
+Crystal Aura: Rompe/coloca cristales de End para dañar enemigos.
+
+Hitboxes: Agranda las cajas de colisión de los enemigos.
+
+Hole Filter: Filtra agujeros seguros en PvP.
+
+Kill Aura: Ataca automáticamente a enemigos cercanos.
+
+Offhand: Gestiona automáticamente objetos en la mano secundaria.
+
+Quiver: Cambia automáticamente entre flechas en el arco.
+
+Self Anvil: Coloca yunques sobre ti mismo.
+
+Self Trap: Te atrapa en bloques automáticamente.
+
+Self Web: Coloca telarañas sobre ti mismo.
+
+Surround: Coloca bloques alrededor tuyo al ser atacado.
+
+2. Player (Jugador)
+Air Place: Coloca bloques en el aire.
+
+Anti Afk: Evita la desconexión por inactividad.
+
+Anti Hunger: Elimina el consumo de hambre.
+
+Auto Clicker: Clic automático (útil para PvP o construcción).
+
+Auto Eat: Come automáticamente cuando tu hambre es baja.
+
+Auto Fish: Pescado automático.
+
+Auto Gap: Usa automáticamente Gapples (manzanas doradas).
+
+Auto Mend: Repara automáticamente objetos encantados.
+
+Auto Replenish: Repone objetos en tu mano automáticamente.
+
+Auto Respawn: Revive automáticamente al morir.
+
+Auto Tool: Cambia automáticamente a la mejor herramienta.
+
+Break Delay: Reduce el retraso al romper bloques.
+
+Chest Swap: Cambia objetos entre cofres y tu inventario.
+
+Exp Thrower: Lanza botellas de experiencia automáticamente.
+
+Fake Player: Crea un jugador falso para pruebas.
+
+Fast Use: Usa objetos más rápido (comida, pociones, etc.).
+
+Ghost Hand: Interactúa con bloques a través de paredes.
+
+Instant Rebreak: Rompe bloques instantáneamente.
+
+Liquid Interact: Interactúa con líquidos como si fueran sólidos.
+
+Middle Click Extra: Interactúa con bloques al hacer clic central.
+
+Multitask: Permite realizar múltiples acciones simultáneamente.
+
+Name Protect: Oculta tu nombre en el chat.
+
+No Interact: Evita interactuar con bloques/entidades.
+
+No Mining Trace: Oculta tu actividad de minería.
+
+No Rotate: Evita que el servidor vea tu rotación.
+
+Portals: Gestiona portales del Nether/End.
+
+Potion Saver: Evita usar pociones innecesariamente.
+
+Potion Spoof: Finge efectos de pociones.
+
+Reach: Aumenta tu alcance de interacción.
+
+Rotation: Controla la rotación de tu personaje.
+
+Speed Mine: Aumenta la velocidad de minería.
+
+3. Movement (Movimiento)
+Air Jump: Salta en el aire sin necesidad de estar en el suelo.
+
+Anchor: Usa anclas de reaparición para impulsarte.
+
+Anti Void: Evita caer al vacío.
+
+Auto Jump: Salta automáticamente al caminar.
+
+Auto Walk: Camina automáticamente hacia adelante.
+
+Auto Wasp: Vuela automáticamente (similar a Flight).
+
+Blink: Congela tu posición en el servidor mientras te mueves localmente.
+
+Boat Fly: Vuela en bote.
+
+Click Tp: Teletransportación al hacer clic.
+
+Elytra Boost: Impulsa tu elytra automáticamente.
+
+Elytra Fly: Vuela con elytra de manera mejorada.
+
+Entity Control: Controla entidades (como botes o animales).
+
+Entity Speed: Aumenta la velocidad de entidades.
+
+Fast Climb: Escala más rápido.
+
+Flight: Vuela como en modo creativo.
+
+Gui Move: Te mueves con interfaces abiertas.
+
+High Jump: Salto alto mejorado.
+
+Jesus: Camina sobre agua o lava.
+
+Long Jump: Salto largo mejorado.
+
+No Fall: Elimina el daño por caídas.
+
+No Slow: Elimina la ralentización al usar objetos.
+
+Parkour: Facilita movimientos de parkour.
+
+Reverse Step: Baja bloques automáticamente.
+
+Safe Walk: Evita caerte de bordes.
+
+Scaffold: Coloca bloques bajo tus pies al puentear.
+
+Slippy: Deslizamiento mejorado en hielo.
+
+Sneak: Agáchate automáticamente.
+
+Speed: Corre más rápido.
+
+Spider: Escala paredes como una araña.
+
+Sprint: Corre automáticamente.
+
+Step: Sube bloques altos sin saltar.
+
+Trident Boost: Impulsa tridentes automáticamente.
+
+Velocity: Reduce el retroceso al ser golpeado.
+
+4. Render (Visuales)
+Better Tab: Mejora la lista de jugadores.
+
+Better Tooltips: Mejora la información de objetos.
+
+Block Esp: Resalta bloques específicos.
+
+Block Selection: Resalta bloques seleccionados.
+
+Blur: Desenfoque en interfaces.
+
+Boss Stock: Muestra la salud de jefes.
+
+Breedcrumbs: Resalta bloques de spawners.
+
+Break Indicators: Muestra el progreso al romper bloques.
+
+Camera Tweaks: Ajustes avanzados de cámara.
+
+Chams: Muestra a los jugadores o mobs a través de las paredes.
+
+City Esp: Resalta estructuras de ciudades.
+
+Entity Owner: Muestra el dueño de entidades.
+
+Esp: Resalta jugadores, mobs o cofres.
+
+Free Look: Permite mover la cámara libremente.
+
+Freecam: Explora como un espectador.
+
+Fullbright: Brillo máximo permanente.
+
+Hand View: Personaliza la vista de tu mano.
+
+Hole Esp: Resalta agujeros seguros.
+
+Item Highlight: Resalta objetos en el suelo.
+
+Item Physics: Física personalizada para objetos.
+
+Light Overlay: Muestra niveles de luz.
+
+Logout Spots: Muestra donde los jugadores se desconectaron.
+
+Marker: Marca posiciones específicas.
+
+Nametags: Muestra nombres de jugadores/mobs desde lejos.
+
+No Render: Oculta ciertos elementos gráficos.
+
+Pop Chams: Efectos visuales al dañar enemigos.
+
+Storage Esp: Resalta contenedores.
+
+Time Changer: Cambia la hora del día visualmente.
+
+Tracers: Líneas hacia entidades.
+
+Trail: Deja un rastro visual.
+
+Trajectories: Muestra la trayectoria de proyectiles.
+
+Void Esp: Resalta el vacío.
+
+Wall Hack: Ve a través de paredes.
+
+Waypoints: Marca puntos de interés en el mundo.
+
+Xray: Ve minerales y estructuras a través de bloques.
+
+5. World (Mundo)
+Ambience: Cambia el ambiente visual.
+
+Auto Breed: Reproduce animales automáticamente.
+
+Auto Brewer: Prepara pociones automáticamente.
+
+Auto Mount: Monta entidades automáticamente.
+
+Auto Nometag: Oculta nombres de entidades.
+
+Auto Shearer: Esquila ovejas automáticamente.
+
+Auto Sign: Escribe en carteles automáticamente.
+
+Auto Smelter: Funde objetos automáticamente en hornos.
+
+Build Height: Muestra límites de construcción.
+
+Collisions: Desactiva colisiones.
+
+Echest Farmer: Gestiona cofres de ender automáticamente.
+
+Enderman Look: Evita que los endermans te ataquen.
+
+Excavator: Excava áreas grandes automáticamente.
+
+Flamethrower: Lanza fuego automáticamente.
+
+Highway Builder: Construye autopistas automáticamente.
+
+Infinity Miner: Minera infinitamente.
+
+Liquid Filter: Filtra líquidos al minar.
+
+Mount Bypass: Ignora restricciones al montar.
+
+No Ghost Blocks: Evita bloques fantasma.
+
+Nuker: Destruye bloques rápidamente a tu alrededor.
+
+Packet Mine: Rompe bloques sin enviar paquetes al servidor.
+
+Spawn Proofer: Evita spawns de mobs.
+
+Stash Finder: Encuentra escondites de jugadores.
+
+Timer: Acelera/ralentiza el juego.
+
+Vein Miner: Minera vetas completas.
+
+6. Misc (Varios)
+Anti Pocket Kick: Evita ser expulsado de servidores.
+
+Auto Reconnect: Reconexión automática al ser kickeado.
+
+Better Beacons: Mejora efectos de balizas.
+
+Better Chat: Mejora la interfaz del chat.
+
+Book Bot: Automatiza la escritura en libros.
+
+Discord Presence: Muestra tu estado en Discord.
+
+Inventory Tweaks: Mejora la gestión del inventario.
+
+Message Aura: Envía mensajes automáticamente.
+
+Notebot: Automatiza notas de bloques musicales.
+
+Notifier: Notifica eventos importantes.
+
+Offhand Crash: Intenta crashear a otros jugadores.
+
+Packet Canceller: Cancela paquetes específicos.
+
+Server Spoof: Finge información del servidor.
+
+Sound Blocker: Bloquea sonidos específicos.
+
+Spam: Envía spam en el chat.
+
+Swarm: Controla múltiples cuentas automáticamente.
+
+Villager Roller: Automatiza el comercio con aldeanos.
+
+7. Addon (Extras)
+Numby Hack: Módulo principal del addon.
+
+81: Posiblemente un identificador o versión del addon.
+
+Auto Log+: Mejora del Auto Log estándar.
+
+BetterPlace: Mejora la colocación de bloques.
+
+Beyblade: Módulo de giro o movimiento circular.
+
+Bonemeal Aura: Aplica bonemeal a cultivos cercanos.
+
+Chat Encryption: Encripta mensajes en el chat.
+
+Condition Toggle: Activa/desactiva condiciones específicas.
+
+Confetti: Efectos visuales de confeti.
+
+Egap Finder: Encuentra Gapples en el suelo.
+
+Flo Rido: Módulo relacionado con movimiento o vuelo.
+
+Game Settings: Ajustes personalizados del juego.
+
+Ignore Deaths: Ignora las muertes.
+
+Jump Helper: Asistencia para saltos.
+
+Log Spots +: Mejora del Logout Spots estándar.
+
+New Chunks: Resalta chunks nuevos generados.
+
+No Strip: Evita que te quiten la armadura.
+
+Packet Delay: Retrasa paquetes enviados al servidor.
+
+Raid Captain Notifier: Notifica la aparición de un capitán de raid.
+
+Ride Stats: Muestra estadísticas de monturas.
+
+Safe Fire: Protege contra el daño por fuego.
+
+Safety Net: Red de seguridad para evitar caídas o daño.
+
+Tunnel Esp: Resalta túneles o cuevas.
+
+Wurst Glide: Modo de vuelo o deslizamiento inspirado en Wurst Client.
